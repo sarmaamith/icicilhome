@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- ============================================================
+     Securiti Consent Banner SDK loader
+     Same pattern used on sarmaamith.github.io/contactus/.
+     Reuses that tenant's tenant-uuid / domain-uuid — confirm in
+     your Securiti console that this GitHub Pages origin
+     (sarmaamith.github.io) is registered under that domain-uuid,
+     otherwise swap in the correct one for this property.
+     After load, call setConsentBannerParams({ uuid: <unique id> })
+     to tag the visitor once you know their mobile number.
+     ============================================================ -->
+<script>
+(function () {
+	var s = document.createElement('script');
+	s.src = 'https://cdn-prod.securiti.ai/consent/cookie-consent-sdk-loader.js';
+	s.setAttribute('data-tenant-uuid', '09f99b07-9b72-4dd3-b6b5-1009a96c2fd4');
+	s.setAttribute('data-domain-uuid', 'a7b4a422-8f08-443a-9700-4223aeb926e3');
+	s.setAttribute('data-backend-url', 'https://app.securiti.ai');
+	s.setAttribute('data-skip-css', 'false');
+	s.defer = true;
+	var parent_node = document.head || document.body;
+	parent_node.appendChild(s);
+})()
+</script>
+<meta charset="UTF-8">
+<title>Get a Quote</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f2f4f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    padding: 32px;
+    width: 100%;
+    max-width: 420px;
+  }
+  .field {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #d9dde2;
+    border-radius: 10px;
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 8px;
+    outline: none;
+  }
+  .field::placeholder {
+    color: #9aa1a8;
+  }
+  .field:focus {
+    border-color: #e8621d;
+  }
+  .link-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  a.link {
+    color: #e8621d;
+    text-decoration: underline;
+    font-weight: 600;
+  }
+  .label {
+    font-size: 12px;
+    color: #e8621d;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .mobile-field {
+    border-color: #e8621d;
+    border-width: 2px;
+    margin-bottom: 24px;
+  }
+  .btn {
+    width: 100%;
+    background: #e8621d;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  .btn:hover {
+    background: #d5560f;
+  }
+  .btn:disabled {
+    background: #eabb9c;
+    cursor: not-allowed;
+  }
+  .retrieve {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 12px;
+  }
+  .checkbox-row input {
+    accent-color: #e8621d;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+  .whatsapp {
+    color: #25D366;
+    font-weight: 600;
+  }
+  .status-msg {
+    font-size: 12px;
+    text-align: center;
+    margin-top: -8px;
+    margin-bottom: 16px;
+    min-height: 14px;
+  }
+  .status-msg.error { color: #c0392b; }
+  .status-msg.success { color: #1e8449; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <form id="quoteForm">
+    <input class="field" id="vehicleReg" type="text" placeholder="Vehicle registration number">
+
+    <div class="link-row">
+      <a href="#" class="link">Got a new vehicle</a>
+      <a href="#" class="link">What is this?</a>
+    </div>
+
+    <span class="label">Mobile number</span>
+    <input class="field mobile-field" id="mobileNumber" type="tel" pattern="[0-9]{10}" maxlength="10" required>
+
+    <button class="btn" type="submit" id="submitBtn">Get quote</button>
+    <div class="status-msg" id="statusMsg"></div>
+
+    <a href="#" class="link retrieve">Retrieve quote</a>
+
+    <label class="checkbox-row">
+      <input type="checkbox" id="consentTerms" checked>
+      <span>I agree to the <a href="#" style="color:#333; text-decoration: underline;">terms and conditions</a></span>
+    </label>
+
+    <label class="checkbox-row">
+      <input type="checkbox" id="consentWhatsapp" checked>
+      <span>I want to receive updates on <span class="whatsapp">&#128222; WhatsApp</span></span>
+    </label>
+  </form>
+</div>
+
+<script>
+(function () {
+
+  // ============================================================
+  // Securiti consent_upload — same endpoint/header shape as the
+  // Godrej Chemicals reference script. Fill in the real API key,
+  // secret, and tenant ID below.
+  //
+  // SECURITY NOTE: this runs client-side on a public GitHub Pages
+  // site, so anything in SECURITI_HEADERS is visible to anyone who
+  // views source / opens devtools. For a real deployment, proxy
+  // this call through a small backend (Cloudflare Worker, Lambda,
+  // etc.) that holds the real key/secret server-side, and have the
+  // page call that proxy instead of app.securiti.ai directly.
+  // ============================================================
+  const SECURITI_ENDPOINT = 'https://app.securiti.ai/privaci/v1/consentapi/consent_upload';
+  const SECURITI_HEADERS = {
+    'X-API-Key':    'YOUR_API_KEY',
+    'X-API-Secret': 'YOUR_API_SECRET',
+    'X-TIDENT':     'YOUR_TENANT_ID',
+    'Content-Type': 'application/json'
+  };
+
+  const FORM_SELECTOR = '#quoteForm';
+  const inFlight = new WeakSet();
+
+  // ============================================================
+  // readForm — pull field/checkbox values by id
+  // ============================================================
+  function readForm(form) {
+    const get = function (id) {
+      const el = form.querySelector('#' + id);
+      return el && el.value ? el.value.trim() : '';
+    };
+    const checked = function (id) {
+      const el = form.querySelector('#' + id);
+      return !!(el && el.checked);
+    };
+    return {
+      vehicleReg:       get('vehicleReg'),
+      mobile:           get('mobileNumber'),
+      termsGranted:     checked('consentTerms'),
+      whatsappGranted:  checked('consentWhatsapp')
+    };
+  }
+
+  // ============================================================
+  // isValid — mobile number required and must be 10 digits;
+  // terms checkbox must be ticked to proceed
+  // ============================================================
+  function isValid(fields) {
+    if (!fields.mobile) return false;
+    if (!/^[0-9]{10}$/.test(fields.mobile)) return false;
+    if (!fields.termsGranted) return false;
+    return true;
+  }
+
+  // ============================================================
+  // buildPayload — Securiti consent_upload schema. Terms consent
+  // and WhatsApp consent are reported as the visitor actually set
+  // them (not hardcoded true), since both are real checkboxes here.
+  // ============================================================
+  function buildPayload(fields) {
+    return {
+      UUID: fields.mobile,
+      uuids: {
+        mobile_number:               fields.mobile,
+        vehicle_registration_number: fields.vehicleReg
+      },
+      activity_timestamp: Math.floor(Date.now() / 1000),
+      consent_source: 'Vehicle Insurance Quote WebForm',
+      consent_info: [
+        {
+          processing_purpose_name: 'Insurance Quote Request',
+          consented_items: [
+            { consent_purpose_name: 'Terms and Conditions', consent_granted: fields.termsGranted }
+          ]
+        },
+        {
+          processing_purpose_name: 'Marketing Communication',
+          consented_items: [
+            { consent_purpose_name: 'WhatsApp', consent_granted: fields.whatsappGranted }
+          ]
+        }
+      ]
+    };
+  }
+
+  // ============================================================
+  // uploadConsent — POST to Securiti
+  // ============================================================
+  async function uploadConsent(payload) {
+    const response = await fetch(SECURITI_ENDPOINT, {
+      method:  'POST',
+      headers: SECURITI_HEADERS,
+      body:    JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error('Securiti ' + response.status + ': ' + errorText);
+    }
+    return response.json();
+  }
+
+  // ============================================================
+  // Submit handler — this form has no real backend action (the
+  // "Get quote" button just demos the flow), so we preventDefault,
+  // upload consent, then show a status message either way.
+  // ============================================================
+  document.addEventListener('submit', function (event) {
+    const form = event.target;
+    if (!form || !form.matches || !form.matches(FORM_SELECTOR)) return;
+
+    event.preventDefault();
+    if (inFlight.has(form)) return; // duplicate-click guard
+
+    const statusMsg = form.querySelector('#statusMsg');
+    const submitBtn = form.querySelector('#submitBtn');
+    const fields = readForm(form);
+
+    if (!isValid(fields)) {
+      statusMsg.textContent = !fields.mobile || !/^[0-9]{10}$/.test(fields.mobile)
+        ? 'Please enter a valid 10-digit mobile number.'
+        : 'You must agree to the terms and conditions to continue.';
+      statusMsg.className = 'status-msg error';
+      return;
+    }
+
+    inFlight.add(form);
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+    statusMsg.textContent = '';
+
+    const payload = buildPayload(fields);
+
+    uploadConsent(payload)
+      .then(function (result) {
+        console.log('Consent recorded (quote):', result);
+        statusMsg.textContent = 'Consent recorded. Fetching your quote...';
+        statusMsg.className = 'status-msg success';
+        // TODO: continue with the real quote flow here (redirect / API call).
+      })
+      .catch(function (err) {
+        console.error('Consent upload failed:', err);
+        statusMsg.textContent = 'Something went wrong recording consent. Please try again.';
+        statusMsg.className = 'status-msg error';
+      })
+      .finally(function () {
+        inFlight.delete(form);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Get quote';
+      });
+  }, true);
+})();
+</script>
+
+</body>
+</html>
