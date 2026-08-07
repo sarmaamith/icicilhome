@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- ============================================================
+     Securiti Consent Banner SDK loader
+     Same pattern used on sarmaamith.github.io/contactus/.
+     Reuses that tenant's tenant-uuid / domain-uuid — confirm in
+     your Securiti console that this GitHub Pages origin
+     (sarmaamith.github.io) is registered under that domain-uuid,
+     otherwise swap in the correct one for this property.
+     ============================================================ -->
+<script>
+(function () {
+	var s = document.createElement('script');
+	s.src = 'https://cdn-prod.securiti.ai/consent/cookie-consent-sdk-loader.js';
+	s.setAttribute('data-tenant-uuid', '09f99b07-9b72-4dd3-b6b5-1009a96c2fd4');
+	s.setAttribute('data-domain-uuid', 'a7b4a422-8f08-443a-9700-4223aeb926e3');
+	s.setAttribute('data-backend-url', 'https://app.securiti.ai');
+	s.setAttribute('data-skip-css', 'false');
+	s.defer = true;
+	var parent_node = document.head || document.body;
+	parent_node.appendChild(s);
+})()
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get a Quote</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #fdf1ea;
+  }
+
+  /* ---------- Top banner + floating card ---------- */
+  .banner {
+    height: 140px;
+    background: linear-gradient(90deg, #d1470f 0%, #e8621d 45%, #f0925a 100%);
+  }
+  .page-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 40px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    margin-top: -100px;
+    padding: 28px 32px 32px;
+  }
+
+  /* ---------- Category tabs ---------- */
+  .tabs {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 28px;
+  }
+  .tab {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    padding: 0;
+    font-family: inherit;
+  }
+  .tab-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 16px;
+    background: #f4f4f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tab.active .tab-icon {
+    background: #f6e3cf;
+  }
+  .tab-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+  .tab-label {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+    padding-bottom: 8px;
+    border-bottom: 2px solid transparent;
+  }
+  .tab.active .tab-label {
+    color: #1a1a1a;
+    font-weight: 700;
+    border-bottom-color: #e8621d;
+  }
+
+  /* ---------- Form row ---------- */
+  .form-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .field-group {
+    flex: 1 1 220px;
+    min-width: 200px;
+  }
+  .field-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+  }
+  .field-group label .req {
+    color: #e8621d;
+  }
+  .underline-field {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    padding: 6px 2px 10px;
+    font-size: 15px;
+    color: #333;
+    outline: none;
+    background: transparent;
+  }
+  .underline-field::placeholder {
+    color: #a3a3a3;
+  }
+  .underline-field:focus {
+    border-bottom-color: #e8621d;
+  }
+  .quote-cta {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 26px;
+  }
+  .btn {
+    background: linear-gradient(90deg, #d1470f, #e8621d);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 16px 48px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover {
+    filter: brightness(0.95);
+  }
+  .btn:disabled {
+    background: #eabb9c;
+    cursor: not-allowed;
+  }
+  .recent-quote {
+    color: #e8621d;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: underline;
+  }
+  .below-links {
+    margin-top: 22px;
+  }
+  a.link {
+    color: #1a1a1a;
+    font-size: 14px;
+    text-decoration: underline;
+    font-weight: 500;
+  }
+  .status-msg {
+    font-size: 13px;
+    margin-top: 6px;
+  }
+  .status-msg.error { color: #c0392b; }
+  .status-msg.success { color: #1e8449; }
+
+  /* ---------- Consent row below the card ---------- */
+  .consent-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 24px 8px 0;
+    font-size: 14px;
+    color: #333;
+  }
+  .consent-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .consent-item input[type="checkbox"] {
+    accent-color: #e8621d;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .consent-divider {
+    width: 1px;
+    height: 20px;
+    background: #ccc;
+  }
+  .whatsapp-icon {
+    color: #333;
+    font-weight: 600;
+  }
+
+  /* ---------- Privacy Center button ---------- */
+  .privacy-btn-row {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 8px 0;
+  }
+  .privacy-btn {
+    background: #fff;
+    color: #e8621d;
+    border: 2px solid #e8621d;
+    border-radius: 999px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .privacy-btn:hover {
+    background: #fdf1ea;
+  }
+
+  /* ---------- Privacy Center modal ---------- */
+  .privacy-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+  }
+  .privacy-modal-overlay.active { display: flex; }
+  .privacy-modal-box {
+    background: #fff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  }
+  .privacy-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+  }
+  .privacy-modal-header h3 { margin: 0; font-size: 16px; color: #333; }
+  .privacy-modal-close {
+    background: none; border: none; font-size: 22px; line-height: 1;
+    cursor: pointer; color: #666; padding: 4px 8px;
+  }
+  .privacy-modal-close:hover { color: #000; }
+  .privacy-modal-body { flex: 1; overflow: auto; }
+  .privacy-modal-body iframe {
+    display: block; border: none; width: 100%; height: 800px;
+  }
+</style>
+</head>
+<body>
+
+<div class="banner"></div>
+
+<div class="page-wrap">
+  <div class="card">
+
+    <!-- Category tabs (Car is the only fully wired form; others are visual) -->
+    <div class="tabs" id="tabs">
+      <button type="button" class="tab active" data-tab="car">
+        <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e8621d" stroke-width="1.6"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h11.2a2 2 0 0 1 1.9 1.5L21 13"/><rect x="2.5" y="13" width="19" height="5" rx="1.5"/><circle cx="7" cy="18.5" r="1.5"/><circle cx="17" cy="18.5" r="1.5"/></svg></span>
+        <span class="tab-label">Car</span>
+      </button>
+      <button type="button" class="tab" data-tab="bike">
+        <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1a2b4c" stroke-width="1.6"><circle cx="5.5" cy="17.5" r="3"/><circle cx="18.5" cy="17.5" r="3"/><path d="M5.5 17.5L9 10h5l3.5 7.5M9 10L8 7H6"/></svg></span>
+        <span class="tab-label">Bike</span>
+      </button>
+      <button type="button" class="tab" data-tab="health">
+        <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e8621d" stroke-width="1.6"><path d="M12 21s-7-4.35-9.5-8.8C1 8.5 3 5 6.5 5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3C18 5 20 8.5 18.5 12.2 16 16.65 12 21 12 21z"/><path d="M4 13h3l1.5-2.5L10 15l1.5-4L13 13h4"/></svg></span>
+        <span class="tab-label">Health</span>
+      </button>
+      <button type="button" class="tab" data-tab="travel">
+        <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e8621d" stroke-width="1.6"><path d="M10.5 3.5L3 12l3 1 1.5 3 3-3 3.5 7.5 2-1L12 5l4 1 4 4-1-6-6-1z"/></svg></span>
+        <span class="tab-label">Travel</span>
+      </button>
+      <button type="button" class="tab" data-tab="home">
+        <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1a2b4c" stroke-width="1.6"><path d="M4 11.5L12 4l8 7.5"/><path d="M6 10v9h12v-9"/><rect x="10" y="13" width="4" height="6"/></svg></span>
+        <span class="tab-label">Home</span>
+      </button>
+      <button type="button" class="tab" data-tab="sme">
+        <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e8621d" stroke-width="1.6"><path d="M3 21V9l9-5 9 5v12"/><path d="M3 21h18"/><path d="M9 21v-6h6v6"/></svg></span>
+        <span class="tab-label">SME</span>
+      </button>
+      <button type="button" class="tab" data-tab="corporate">
+        <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1a2b4c" stroke-width="1.6"><rect x="4" y="3" width="8" height="18"/><rect x="12" y="8" width="8" height="13"/><path d="M7 7h2M7 11h2M7 15h2M15 12h2M15 16h2"/></svg></span>
+        <span class="tab-label">Corporate</span>
+      </button>
+      <button type="button" class="tab" data-tab="renewal">
+        <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e8621d" stroke-width="1.6"><path d="M4 4v6h6"/><path d="M4.6 15A8 8 0 1 0 6 7.3L4 10"/></svg></span>
+        <span class="tab-label">Renewal</span>
+      </button>
+    </div>
+
+    <!-- Car quote form -->
+    <form id="quoteForm">
+      <div class="form-row">
+        <div class="field-group">
+          <label for="carReg">Car registration no.<span class="req">*</span></label>
+          <input class="underline-field" id="carReg" type="text" placeholder="E.G. MH01DF5698">
+        </div>
+        <div class="field-group">
+          <label for="mobileNumber">Mobile number<span class="req">*</span></label>
+          <input class="underline-field" id="mobileNumber" type="tel" pattern="[0-9]{10}" maxlength="10" placeholder="Enter mobile no.">
+        </div>
+        <div class="field-group">
+          <label for="emailAddress">Email<span class="req">*</span></label>
+          <input class="underline-field" id="emailAddress" type="email" placeholder="Enter email address">
+        </div>
+        <div class="quote-cta">
+          <button class="btn" type="submit" id="submitBtn">Get quote</button>
+          <a href="#" class="recent-quote">Recent Quote</a>
+        </div>
+      </div>
+      <div class="status-msg" id="statusMsg"></div>
+      <div class="below-links">
+        <a href="#" class="link">Got a new vehicle</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Consent row -->
+  <div class="consent-row">
+    <label class="consent-item">
+      <input type="checkbox" id="consentTerms" checked>
+      <span>I agree to the terms &amp; conditions</span>
+    </label>
+    <div class="consent-divider"></div>
+    <label class="consent-item">
+      <input type="checkbox" id="consentWhatsapp" checked>
+      <span>I want to get my quote and policy details on <span class="whatsapp-icon">&#128222; WhatsApp</span></span>
+    </label>
+  </div>
+
+  <div class="privacy-btn-row">
+    <button type="button" class="privacy-btn" id="privacyCenterBtn">Privacy Center</button>
+  </div>
+</div>
+
+<!-- Privacy Center modal — opens the Securiti privacy center embed in-page -->
+<div class="privacy-modal-overlay" id="privacyModal">
+  <div class="privacy-modal-box">
+    <div class="privacy-modal-header">
+      <h3>Privacy Center</h3>
+      <button type="button" class="privacy-modal-close" id="privacyModalClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="privacy-modal-body">
+      <iframe id="privacyModalFrame" src="" style="border: none; width: 100%; height: 800px;"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var PRIVACY_CENTER_URL = 'https://icicilombard589288.app6.privacycenter.cloud/privacy-center-embed';
+  var openBtn = document.getElementById('privacyCenterBtn');
+  var closeBtn = document.getElementById('privacyModalClose');
+  var overlay = document.getElementById('privacyModal');
+  var frame = document.getElementById('privacyModalFrame');
+
+  openBtn.addEventListener('click', function () {
+    if (!frame.src) { frame.src = PRIVACY_CENTER_URL; } // lazy-load on first open
+    overlay.classList.add('active');
+  });
+  closeBtn.addEventListener('click', function () {
+    overlay.classList.remove('active');
+  });
+  overlay.addEventListener('click', function (event) {
+    if (event.target === overlay) { overlay.classList.remove('active'); }
+  });
+})();
+
+// Tabs are visual only — only the Car form below is wired to the consent flow.
+(function () {
+  var tabs = document.querySelectorAll('#tabs .tab');
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+    });
+  });
+})();
+</script>
+
+<script>
+(function () {
+
+  // ============================================================
+  // Securiti consent_upload — capture form consent and send it
+  // to Securiti's Consent API. Fields now match the Car quote
+  // form above: car registration no., mobile number, email, plus
+  // the terms and WhatsApp checkboxes.
+  //
+  // SECURITY NOTE: this runs client-side on a public GitHub Pages
+  // site, so anything in SECURITI_HEADERS is visible to anyone who
+  // views source / opens devtools. For a real deployment, proxy
+  // this call through a small backend (Cloudflare Worker, Lambda,
+  // etc.) that holds the real key/secret server-side, and have the
+  // page call that proxy instead of app6.securiti.ai directly.
+  // ============================================================
+  const SECURITI_ENDPOINT = 'https://app6.securiti.ai/privaci/v1/consentapi/consent_upload';
+  const SECURITI_HEADERS = {
+    'X-API-Key':    'YOUR_API_KEY',
+    'X-API-Secret': 'YOUR_API_SECRET',
+    'X-TIDENT':     'YOUR_TENANT_ID',
+    'Content-Type': 'application/json'
+  };
+
+  const FORM_SELECTOR = '#quoteForm';
+  const inFlight = new WeakSet();
+
+  // ============================================================
+  // readForm — pull field/checkbox values by id
+  // ============================================================
+  function readForm(form) {
+    // Fields live inside the form; the consent checkboxes sit
+    // below the white card, outside the <form> element — so look
+    // both up by document-wide id rather than scoping to the form.
+    const get = function (id) {
+      const el = document.getElementById(id);
+      return el && el.value ? el.value.trim() : '';
+    };
+    const checked = function (id) {
+      const el = document.getElementById(id);
+      return !!(el && el.checked);
+    };
+    return {
+      carReg:           get('carReg'),
+      mobile:           get('mobileNumber'),
+      email:            get('emailAddress'),
+      termsGranted:     checked('consentTerms'),
+      whatsappGranted:  checked('consentWhatsapp')
+    };
+  }
+
+  // ============================================================
+  // isValid — car reg, mobile, and email are all required (marked
+  // with * in the UI); terms checkbox must be ticked to proceed
+  // ============================================================
+  function isValid(fields) {
+    if (!fields.carReg) return false;
+    if (!fields.mobile || !/^[0-9]{10}$/.test(fields.mobile)) return false;
+    if (!fields.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) return false;
+    if (!fields.termsGranted) return false;
+    return true;
+  }
+
+  // ============================================================
+  // validationMessage — first failing requirement, in field order
+  // ============================================================
+  function validationMessage(fields) {
+    if (!fields.carReg) return 'Please enter your car registration number.';
+    if (!fields.mobile || !/^[0-9]{10}$/.test(fields.mobile)) return 'Please enter a valid 10-digit mobile number.';
+    if (!fields.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) return 'Please enter a valid email address.';
+    if (!fields.termsGranted) return 'You must agree to the terms and conditions to continue.';
+    return '';
+  }
+
+  // ============================================================
+  // buildPayload — Securiti consent_upload schema. Consent values
+  // reflect what the visitor actually checked, not hardcoded true.
+  // ============================================================
+  function buildPayload(fields) {
+    return {
+      UUID: fields.email,
+      uuids: {
+        email:                 fields.email,
+        mobile_number:         fields.mobile,
+        car_registration_number: fields.carReg
+      },
+      activity_timestamp: Math.floor(Date.now() / 1000),
+      consent_source: 'Car Insurance Quote WebForm',
+      consent_info: [
+        {
+          processing_purpose_name: 'Car Insurance Quote Request',
+          consented_items: [
+            { consent_purpose_name: 'Terms and Conditions', consent_granted: fields.termsGranted }
+          ]
+        },
+        {
+          processing_purpose_name: 'Marketing Communication',
+          consented_items: [
+            { consent_purpose_name: 'WhatsApp', consent_granted: fields.whatsappGranted }
+          ]
+        }
+      ]
+    };
+  }
+
+  // ============================================================
+  // uploadConsent — POST to Securiti
+  // ============================================================
+  async function uploadConsent(payload) {
+    const response = await fetch(SECURITI_ENDPOINT, {
+      method:  'POST',
+      headers: SECURITI_HEADERS,
+      body:    JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error('Securiti ' + response.status + ': ' + errorText);
+    }
+    return response.json();
+  }
+
+  // ============================================================
+  // Submit handler — preventDefault, upload consent, show status.
+  // ============================================================
+  document.addEventListener('submit', function (event) {
+    const form = event.target;
+    if (!form || !form.matches || !form.matches(FORM_SELECTOR)) return;
+
+    event.preventDefault();
+    if (inFlight.has(form)) return; // duplicate-click guard
+
+    const statusMsg = form.querySelector('#statusMsg');
+    const submitBtn = form.querySelector('#submitBtn');
+    const fields = readForm(form);
+
+    if (!isValid(fields)) {
+      if (statusMsg) {
+        statusMsg.textContent = validationMessage(fields);
+        statusMsg.className = 'status-msg error';
+      }
+      return;
+    }
+
+    inFlight.add(form);
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting...'; }
+    if (statusMsg) { statusMsg.textContent = ''; }
+
+    const payload = buildPayload(fields);
+
+    uploadConsent(payload)
+      .then(function (result) {
+        console.log('Consent recorded (quote):', result);
+        if (statusMsg) {
+          statusMsg.textContent = 'Consent recorded. Fetching your quote...';
+          statusMsg.className = 'status-msg success';
+        }
+        // TODO: continue with the real quote flow here (redirect / API call).
+      })
+      .catch(function (err) {
+        console.error('Consent upload failed:', err);
+        if (statusMsg) {
+          statusMsg.textContent = 'Something went wrong recording consent. Please try again.';
+          statusMsg.className = 'status-msg error';
+        }
+      })
+      .finally(function () {
+        inFlight.delete(form);
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Get quote'; }
+      });
+  }, true);
+})();
+</script>
+
+</body>
+</html>
