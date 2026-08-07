@@ -3,14 +3,8 @@
 <head>
 <!-- ============================================================
      Securiti Consent Banner SDK loader
-     Same pattern used on sarmaamith.github.io/contactus/.
-     Reuses that tenant's tenant-uuid / domain-uuid — confirm in
-     your Securiti console that this GitHub Pages origin
-     (sarmaamith.github.io) is registered under that domain-uuid,
-     otherwise swap in the correct one for this property.
+     Points at the icicilombard589288 tenant on app6.
      ============================================================ -->
-
-<!-- After adding this script, call setConsentBannerParams({uuid: <unique id> }) to set unique ID for a customer.  -->
 <script>
 (function () {
 	var s = document.createElement('script');
@@ -322,6 +316,10 @@
         <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e8621d" stroke-width="1.6"><path d="M4 4v6h6"/><path d="M4.6 15A8 8 0 1 0 6 7.3L4 10"/></svg></span>
         <span class="tab-label">Renewal</span>
       </button>
+      <button type="button" class="tab" id="privacyTab" data-tab="privacy">
+        <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1a2b4c" stroke-width="1.6"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z"/><path d="M9.5 12l1.8 1.8L14.5 10"/></svg></span>
+        <span class="tab-label">Privacy Tab</span>
+      </button>
     </div>
 
     <!-- Car quote form -->
@@ -402,11 +400,20 @@
   });
 })();
 
-// Tabs are visual only — only the Car form below is wired to the consent flow.
+// Tabs are visual only — only the Car form below is wired to the consent
+// flow. "Privacy Tab" is the exception: it doesn't toggle active state,
+// it opens the Securiti privacy center in a new browser tab (the iframe
+// modal approach was blocked by the privacy center's frame-ancestors/
+// X-Frame-Options restrictions, so a plain new-tab link is used instead).
 (function () {
+  var PRIVACY_CENTER_URL = 'https://icicilombard589288.app6.privacycenter.cloud/';
   var tabs = document.querySelectorAll('#tabs .tab');
   tabs.forEach(function (tab) {
     tab.addEventListener('click', function () {
+      if (tab.id === 'privacyTab') {
+        window.open(PRIVACY_CENTER_URL, 'privacyTab');
+        return;
+      }
       tabs.forEach(function (t) { t.classList.remove('active'); });
       tab.classList.add('active');
     });
